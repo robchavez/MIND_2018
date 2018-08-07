@@ -1,0 +1,155 @@
+---
+title: "MIND_carolyn_data"
+author: "Rob Chavez"
+date: "July 31, 2018"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(stringr)
+
+
+setwd("C:/Users/rober/Google Drive/MIND_2018")
+
+cp_brain<- read.csv("all_pairs_data_scaled_Study1_anonymized.csv", stringsAsFactors = FALSE)
+
+# personality data
+cp_anon_pers <- read.csv("anon_pers_data.csv",stringsAsFactors = FALSE)
+
+pers <- cp_anon_pers %>% filter(anon_id != "") %>% filter()  
+
+items <- pers %>%  select(-Extraversion, -Agreeableness, -Conscientiousness, -Neuroticism, -Openness, -anon_id)  
+
+brain_ids <- unique(c(as.character(cp_brain$anon_subj1), as.character(cp_brain$anon_subj2)))
+
+
+brain_ids_df <- data.frame(anon_id = brain_ids)
+
+brain_pers <- inner_join(brain_ids_df, cp_anon_pers) %>% arrange(anon_id)
+
+brain_pers_items <- brain_pers %>% select(-Extraversion, -Agreeableness, -Conscientiousness, -Neuroticism, -Openness, -anon_id)
+
+```
+
+```{r}
+
+# Calculate dissimilarities
+d_items <- dist(brain_pers_items)
+d_extra <- dist(brain_pers$Extraversion)
+d_open <- dist(brain_pers$Openness)
+d_neurotic <- dist(brain_pers$Neuroticism)
+d_consci <- dist(brain_pers$Conscientiousness)
+d_agree <- dist(brain_pers$Agreeableness)
+
+
+# Plot full personality DSM
+dsm_mask(d_items) %>% dsm_plot(color_dir = -1)
+
+```
+
+```{r}
+
+# 
+personality_dsm <- data.frame(all_trait_dist = as.numeric(as.matrix(d_items)))
+personality_dsm$open_dist <- as.numeric(as.matrix(dist(brain_pers$Openness)))
+personality_dsm$consci_dist <- as.numeric(as.matrix(dist(brain_pers$Conscientiousness)))
+personality_dsm$extra_dist <- as.numeric(as.matrix(dist(brain_pers$Extraversion)))
+personality_dsm$agree_dist <- as.numeric(as.matrix(dist(brain_pers$Agreeableness)))
+personality_dsm$neurotic_dist <- as.numeric(as.matrix(dist(brain_pers$Neuroticism)))
+
+personality_dsm$sub1 <- rep(brain_pers$anon_id, 42)
+
+sub2 <- vector()
+for(i in brain_pers$anon_id){
+  
+  r <- rep(i, 42)
+  sub2 <- c(sub2, r)
+  
+}
+
+
+personality_dsm$sub2 <- sub2
+
+personality_dsm$anon_dyad <- str_c(personality_dsm$sub1,personality_dsm$sub2, sep = '_')
+
+
+dyad_df <- inner_join(personality_dsm, cp_brain) 
+
+dyad_df_cor <- dyad_df %>% select(-sub1, -sub2, -anon_subj1, -anon_subj2, -anon_dyad)  
+dyad_df$soc_dist2 <- ifelse(dyad_df$soc_dist ==5, 4, dyad_df$soc_dist)
+  
+corall <- cor(dyad_df_cor)
+```
+
+
+
+
+```{r}
+all <- ggbar.maker(dyad_df$all_trait_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,7.5)) + 
+  labs(title = "All trait dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+extra <- ggbar.maker(dyad_df$extra_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,2)) + 
+  labs(title = "Extraversion dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+open <- ggbar.maker(dyad_df$open_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,2)) + 
+  labs(title = "Openness dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+consci <- ggbar.maker(dyad_df$consci_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,2)) + 
+  labs(title = "Conscientiousness dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+neurotic <- ggbar.maker(dyad_df$neurotic_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,2)) + 
+  labs(title = "Neuroticism dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+agree <- ggbar.maker(dyad_df$agree_dist, dyad_df$soc_dist2, palette = 'Greens') + 
+  coord_cartesian(ylim = c(0,2)) + 
+  labs(title = "Agreeableness dissimilarity", x = "social distance", y = "dissimilarity") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+multiplot(all, extra, open, consci, neurotic, agree, cols = 3)
+```
+
+```{r}
+# Function to run lmer on each ROI
+lmer_brain <- function(roi){
+  exp <- paste("fit <- lmer(all_trait_dist ~", roi,"  + (1 + ",roi, "|sub1) +  (1 + ", roi,"|sub2), REML = FALSE,   data = dyad_df)")
+  eval(parse(text = exp))
+  pval <- summary(fit)[10][[1]][[10]]
+  p <- paste(pval, roi)
+
+print(p) 
+}
+
+# Run mix model on all brain areas 
+for(i in grep('ctx',ls(dyad_df_cor),value = TRUE)){
+  lmer_brain(i)
+}
+
+for(i in grep('Right',ls(dyad_df_cor),value = TRUE)){
+     lmer_brain(i)}
+
+for(i in grep('Right',ls(dyad_df_cor),value = TRUE)){
+     lmer_brain(i)}
+
+```
+
+
+
+
+
