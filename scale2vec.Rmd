@@ -16,6 +16,9 @@ In clinical settings as well as experimental research, there is often a need to 
 The code below attempts a rudimentary approach to meeting this challenge. Here, we attempt to use the average distance between word vectors in a phrase to imputate an assessment score for an "unassesssed" questionarre. We the compare the predicted responses from this data to actual responses from a set of real subjects.   
 
 **Spoiler alert:** It doesn't work as implimented here. However, it provides food for thought and an avenune for a more refined approach to this question going forward.  
+
+https://github.com/robchavez/misc_analyses/blob/master/dti_selfesteem/wholebrain_dti_selfesteem.ipynb
+
 ```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 library(text2vec)
@@ -220,4 +223,6 @@ summary(fit)
 
 ```
 
+## link to brain
 
+https://github.com/robchavez/misc_analyses/blob/master/dti_selfesteem/wholebrain_dti_selfesteem.ipynb

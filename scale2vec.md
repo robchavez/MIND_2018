@@ -17,6 +17,9 @@ The code below attempts a rudimentary approach to meeting this challenge. Here, 
 
 **Spoiler alert:** It doesn't work as implimented here. However, it provides food for thought and an avenune for a more refined approach to this question going forward.  
 
+https://github.com/robchavez/misc_analyses/blob/master/dti_selfesteem/wholebrain_dti_selfesteem.ipynb
+
+
 ```r
 library(tidyverse)
 library(text2vec)
@@ -58,10 +61,9 @@ wv_main <-  glove$fit_transform(tcm, n_iter = 10, convergence_tol = 0.005)
 ```
 
 ```
-## INFO [2018-08-07 14:30:09] 2018-08-07 14:30:09 - epoch 1, expected cost 0.1673
-## INFO [2018-08-07 14:30:09] 2018-08-07 14:30:09 - epoch 2, expected cost 0.1364
-## INFO [2018-08-07 14:30:10] 2018-08-07 14:30:10 - epoch 3, expected cost 0.1701
-## INFO [2018-08-07 14:30:10] Success: early stopping. Improvement at iterartion 3 is less then convergence_tol
+## INFO [2018-08-07 15:28:06] 2018-08-07 15:28:06 - epoch 1, expected cost 0.1807
+## INFO [2018-08-07 15:28:06] 2018-08-07 15:28:06 - epoch 2, expected cost 0.1911
+## INFO [2018-08-07 15:28:06] Success: early stopping. Improvement at iterartion 2 is less then convergence_tol
 ```
 
 
@@ -228,7 +230,7 @@ chisq.test(table)
 ## 	Pearson's Chi-squared test
 ## 
 ## data:  table
-## X-squared = 26.289, df = 16, p-value = 0.05009
+## X-squared = 24.956, df = 16, p-value = 0.07061
 ```
 
 ```r
@@ -240,33 +242,33 @@ confusionMatrix(table)
 ## 
 ##    
 ##       1   2   3   4   5
-##   1   8  21  27  41  20
-##   2  27  58  75 136  54
-##   3  45  93 165 203  82
-##   4  46  85 103 149 103
-##   5  24  39  56  83  57
+##   1   9  18  40  32  18
+##   2  45  60  97 103  45
+##   3  78 126 151 172  61
+##   4  69  77 114 147  79
+##   5  42  47  60  69  41
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.2428          
-##                  95% CI : (0.2231, 0.2633)
-##     No Information Rate : 0.34            
+##                Accuracy : 0.2267          
+##                  95% CI : (0.2075, 0.2467)
+##     No Information Rate : 0.2906          
 ##     P-Value [Acc > NIR] : 1               
 ##                                           
-##                   Kappa : 0.0143          
-##  Mcnemar's Test P-Value : 1.69e-09        
+##                   Kappa : 9e-04           
+##  Mcnemar's Test P-Value : 1.692e-10       
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: 1 Class: 2 Class: 3 Class: 4 Class: 5
-## Sensitivity          0.053333  0.19595  0.38732  0.24346  0.18038
-## Specificity          0.933939  0.80585  0.69214  0.71633  0.86388
-## Pos Pred Value       0.068376  0.16571  0.28061  0.30658  0.22008
-## Neg Pred Value       0.915627  0.83586  0.78465  0.64764  0.83193
-## Prevalence           0.083333  0.16444  0.23667  0.34000  0.17556
-## Detection Rate       0.004444  0.03222  0.09167  0.08278  0.03167
-## Detection Prevalence 0.065000  0.19444  0.32667  0.27000  0.14389
-## Balanced Accuracy    0.493636  0.50090  0.53973  0.47990  0.52213
+## Sensitivity           0.03704  0.18293  0.32684  0.28107  0.16803
+## Specificity           0.93064  0.80299  0.67339  0.73453  0.85990
+## Pos Pred Value        0.07692  0.17143  0.25680  0.30247  0.15830
+## Neg Pred Value        0.86096  0.81517  0.74340  0.71385  0.86827
+## Prevalence            0.13500  0.18222  0.25667  0.29056  0.13556
+## Detection Rate        0.00500  0.03333  0.08389  0.08167  0.02278
+## Detection Prevalence  0.06500  0.19444  0.32667  0.27000  0.14389
+## Balanced Accuracy     0.48384  0.49296  0.50012  0.50780  0.51396
 ```
 
 
@@ -294,13 +296,13 @@ cor.test(melt_jf_pers$value, melt_jf_pers$jf_guess_all)
 ## 	Pearson's product-moment correlation
 ## 
 ## data:  melt_jf_pers$value and melt_jf_pers$jf_guess_all
-## t = 0.47636, df = 1798, p-value = 0.6339
+## t = -0.39028, df = 1798, p-value = 0.6964
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  -0.03498722  0.05740599
+##  -0.05538247  0.03701456
 ## sample estimates:
-##        cor 
-## 0.01123336
+##          cor 
+## -0.009203603
 ```
 
 ```r
@@ -315,29 +317,31 @@ summary(fit)
 ##    Data: melt_jf_pers
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##   5375.0   5408.0  -2681.5   5363.0     1794 
+##   5377.6   5410.5  -2682.8   5365.6     1794 
 ## 
 ## Scaled residuals: 
 ##      Min       1Q   Median       3Q      Max 
-## -2.75633 -0.70679 -0.03901  0.73770  2.22846 
+## -2.73773 -0.74028 -0.03614  0.75823  2.16883 
 ## 
 ## Random effects:
 ##  Groups   Name         Variance Std.Dev. Corr 
-##  variable (Intercept)  0.293712 0.54195       
-##           jf_guess_all 0.002251 0.04745  -1.00
-##  Residual              1.096652 1.04721       
+##  variable (Intercept)  0.197999 0.44497       
+##           jf_guess_all 0.000386 0.01965  -1.00
+##  Residual              1.098483 1.04809       
 ## Number of obs: 1800, groups:  variable, 50
 ## 
 ## Fixed effects:
-##                Estimate Std. Error         df t value Pr(>|t|)    
-## (Intercept)   3.236e+00  1.073e-01  6.086e+01  30.159   <2e-16 ***
-## jf_guess_all -4.642e-05  2.212e-02  2.279e+02  -0.002    0.998    
+##               Estimate Std. Error        df t value Pr(>|t|)    
+## (Intercept)    3.30011    0.09223  65.65557  35.782   <2e-16 ***
+## jf_guess_all  -0.02111    0.02035 779.10975  -1.037      0.3    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr)
-## jf_guess_ll -0.846
+## jf_guess_ll -0.767
 ```
 
+## link to brain
 
+https://github.com/robchavez/misc_analyses/blob/master/dti_selfesteem/wholebrain_dti_selfesteem.ipynb
